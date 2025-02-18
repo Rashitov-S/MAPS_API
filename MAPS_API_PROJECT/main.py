@@ -13,6 +13,7 @@ API_KEY_STATIC = 'f3a0fe3a-b07e-4840-a1da-06f18b2ddf13'
 
 class MainWindow(QMainWindow):
     g_map: QLabel
+    press_delta = 0.1
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,10 +26,30 @@ class MainWindow(QMainWindow):
         self.refresh_map()
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key.Key_PageUp and self.map_zoom < 17:
-            self.map_zoom += 1
-        if event.key() == Qt.Key.Key_PageDown and self.map_zoom > 0:
-            self.map_zoom -= 1
+        key = event.key()
+        if key == Qt.Key.Key_PageUp:
+            if self.map_zoom < 17:
+                self.map_zoom += 1
+        elif key == Qt.Key.Key_PageDown:
+            if self.map_zoom > 0:
+                self.map_zoom -= 1
+        elif key == Qt.Key.Key_Right:
+            self.map_ll[0] += self.press_delta
+            if self.map_ll[0] > 180:
+                self.map_ll[0] = self.map_ll[0] - 360
+        elif key == Qt.Key.Key_Left:
+            self.map_ll[0] -= self.press_delta
+            if self.map_ll[0] < 0:
+                self.map_ll[0] = self.map_ll[0] + 360
+        elif key == Qt.Key.Key_Up:
+            if self.map_ll[1] + self.press_delta < 90:
+                self.map_ll[1] += self.press_delta
+        elif key == Qt.Key.Key_Down:
+            if self.map_ll[1] - self.press_delta > -90:
+                self.map_ll[1] -= self.press_delta
+        else:
+            return
+
         self.refresh_map()
 
     def refresh_map(self):
